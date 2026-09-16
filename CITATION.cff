@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this crosswalk, please cite it as below."
+title: "Crosswalk Lookup: A TSA Pipeline-2021-02 to Multi-Framework Cybersecurity Control Crosswalk"
+type: software
+# Portfolio/evidence category: Software and interactive resources
+version: 0.1.0
+date-released: 2026-09-16
+status: Verified — author sign-off complete 2026-09-16; awaiting GitHub/Zenodo publish for a DOI
+authors:
+  - family-names: Ikwuogu
+    given-names: Friday Ogochukwu
+    orcid: "https://orcid.org/0009-0009-2222-1318"
+    affiliation: "Independent Researcher, Odessa, Texas, USA"
+    email: fo.ikwuogu@gmail.com
+  - family-names: Mike-Ewewie
+    given-names: David
+    affiliation: "Computer Science Department, University of Texas Permian Basin, Odessa, Texas, USA"
+    email: mike_d63291@utpb.edu
+  - family-names: Ayozie
+    given-names: Osorachukwu Maurice
+    affiliation: "MSc Computer Science Cybersecurity, University of Texas Permian Basin, Odessa, Texas, USA"
+    email: ayozie_o62237@utpb.edu
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+keywords:
+  - TSA Pipeline-2021-02
+  - cybersecurity crosswalk
+  - NIST SP 800-82
+  - NIST SP 800-53
+  - IEC 62443
+  - CIS Controls v8
+  - NIST CSF 2.0
+  - operational technology
+  - OT compliance
+  - incident response
+  - security governance

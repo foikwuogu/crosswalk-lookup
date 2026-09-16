@@ -1,0 +1,27 @@
+{
+  "authors": [
+    {
+      "name": "Friday Ogochukwu Ikwuogu",
+      "orcid": "0009-0009-2222-1318",
+      "email": "fo.ikwuogu@gmail.com",
+      "affiliation": "Independent Researcher, Odessa, Texas, USA",
+      "role": "corresponding author",
+      "credit": ["Conceptualization", "Data curation", "Software", "Writing – original draft"]
+    },
+    {
+      "name": "David Mike-Ewewie",
+      "email": "mike_d63291@utpb.edu",
+      "affiliation": "Computer Science Department, University of Texas Permian Basin, Odessa, Texas, USA",
+      "role": "co-author",
+      "credit": ["Validation", "Writing – review & editing"]
+    },
+    {
+      "name": "Osorachukwu Maurice Ayozie",
+      "email": "ayozie_o62237@utpb.edu",
+      "affiliation": "MSc Computer Science Cybersecurity, University of Texas Permian Basin, Odessa, Texas, USA",
+      "role": "co-author",
+      "credit": ["Validation", "Writing – review & editing"]
+    }
+  ],
+  "note": "Updated 2026-09-16 at the author's request: this project's co-author list now matches the related 'TSA Pipeline Policy-to-Control Crosswalk' project's co-author list (David Mike-Ewewie, Osorachukwu Maurice Ayozie), since both share the same underlying dataset. Supersedes the 2026-09-14 author block for this project, which listed Abidemi Orimogunje as co-author instead."
+}

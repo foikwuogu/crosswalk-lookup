@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crosswalk Lookup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#eef1ef;
+    --surface:#ffffff;
+    --surface-2:#e4e9e6;
+    --ink:#182220;
+    --muted:#57655f;
+    --line:#c6d0ca;
+    --line-strong:#9fada6;
+    --accent:#b0591c;
+    --accent-ink:#fff8f2;
+    --accent-soft:#f1e2d3;
+    --warn:#a3271f;
+    --warn-soft:#f3ddd9;
+    --ok:#3c6b4a;
+    --ok-soft:#dde8e0;
+    --radius:3px;
+    --font-display:"IBM Plex Sans Condensed",system-ui,sans-serif;
+    --font-body:"IBM Plex Sans",system-ui,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#111613;
+      --surface:#181f1b;
+      --surface-2:#1f2723;
+      --ink:#e9efe9;
+      --muted:#9aaca3;
+      --line:#2c3733;
+      --line-strong:#455049;
+      --accent:#e08a44;
+      --accent-ink:#1b1108;
+      --accent-soft:#3a2a1a;
+      --warn:#e2685c;
+      --warn-soft:#3c2422;
+      --ok:#6fae82;
+      --ok-soft:#20362a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#111613;
+    --surface:#181f1b;
+    --surface-2:#1f2723;
+    --ink:#e9efe9;
+    --muted:#9aaca3;
+    --line:#2c3733;
+    --line-strong:#455049;
+    --accent:#e08a44;
+    --accent-ink:#1b1108;
+    --accent-soft:#3a2a1a;
+    --warn:#e2685c;
+    --warn-soft:#3c2422;
+    --ok:#6fae82;
+    --ok-soft:#20362a;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.5;
+    padding-inline:20px;
+    padding-block:28px 60px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+
+  /* ---- title block ---- */
+  .titleblock{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    justify-content:space-between;
+    align-items:flex-end;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    padding:18px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .titleblock .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  .titleblock h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(26px,4vw,36px);
+    margin:0;
+    text-wrap:balance;
+    letter-spacing:-0.01em;
+  }
+  .titleblock .sub{
+    font-size:13.5px;
+    color:var(--muted);
+    margin-top:6px;
+    max-width:52ch;
+  }
+  .meta{
+    display:grid;
+    grid-template-columns:auto auto;
+    gap:2px 14px;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--muted);
+    border-left:1px solid var(--line);
+    padding-left:16px;
+    align-self:stretch;
+  }
+  .meta dt{grid-column:1;text-transform:uppercase;letter-spacing:.06em;}
+  .meta dd{grid-column:2;margin:0;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .meta .status{color:var(--ok);font-weight:600;}
+
+  .stamp{
+    position:absolute;
+    top:14px;
+    right:18px;
+    border:2px solid var(--ok);
+    color:var(--ok);
+    font-family:var(--font-mono);
+    font-weight:600;
+    font-size:11px;
+    letter-spacing:.1em;
+    padding:4px 8px;
+    transform:rotate(-3deg);
+    border-radius:2px;
+    background:var(--ok-soft);
+  }
+  @media (max-width:640px){ .stamp{position:static;transform:none;display:inline-block;margin-top:10px;} .meta{border-left:none;padding-left:0;} }
+
+  /* ---- outcome selector ---- */
+  .selector{
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--line-strong);
+    border:1px solid var(--line-strong);
+  }
+  @media (max-width:900px){ .selector{grid-template-columns:1fr 1fr;} }
+  .selector button{
+    appearance:none;
+    border:0;
+    background:var(--surface);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    text-align:left;
+    padding:12px 14px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .selector button .id{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    color:var(--muted);
+    letter-spacing:.05em;
+  }
+  .selector button:hover{background:var(--surface-2);}
+  .selector button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+  .selector button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);}
+  .selector button[aria-pressed="true"] .id{color:var(--accent-ink);opacity:.8;}
+
+  .outcome-summary{
+    margin-top:18px;
+    padding:14px 16px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .outcome-summary strong{color:var(--ink);}
+
+  /* ---- framework grid ---- */
+  .grid{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+  }
+  .plate{
+    border:1px solid var(--line);
+    background:var(--surface);
+    padding:14px 15px 15px;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    min-width:0;
+  }
+  .plate .fw-name{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:14.5px;
+    letter-spacing:.01em;
+  }
+  .ids{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+  .ids code{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:2px;
+    padding:2px 6px;
+    line-height:1.4;
+  }
+  .plate p.desc{
+    margin:0;
+    font-size:12.8px;
+    color:var(--ink);
+    opacity:.92;
+  }
+  .src-line{
+    margin-top:auto;
+    padding-top:8px;
+    border-top:1px dashed var(--line);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    color:var(--muted);
+  }
+  .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  .dot.primary{background:var(--ok);}
+  .dot.derived{background:var(--muted);border:1px solid var(--line-strong);background:transparent;}
+  .dot.author-mapped{background:var(--accent);}
+  .src-tag{text-transform:uppercase;letter-spacing:.04em;}
+  .src-tag.author-mapped{color:var(--accent);font-weight:600;}
+
+  .legend{
+    margin-top:16px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+
+  footer{
+    margin-top:34px;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    font-size:12px;
+    color:var(--muted);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  footer a{color:var(--muted);}
+  footer .authors{font-family:var(--font-mono);font-size:11px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <div class="stamp">VERIFIED · 2026‑09‑16</div>
+    <div>
+      <p class="eyebrow">TSA Pipeline‑2021‑02 &nbsp;⇄&nbsp; Five Frameworks</p>
+      <h1>Crosswalk Lookup</h1>
+      <p class="sub">One TSA performance-based pipeline cybersecurity outcome, mapped instantly across five frameworks for CIP / CIRP / CAP documentation.</p>
+    </div>
+    <dl class="meta">
+      <dt>Doc</dt><dd>CWL‑01</dd>
+      <dt>Rev</dt><dd id="rev-date">—</dd>
+      <dt>Status</dt><dd class="status">VERIFIED</dd>
+      <dt>Outcomes</dt><dd>6</dd>
+    </dl>
+  </div>
+
+  <div class="selector" id="selector" role="tablist" aria-label="TSA outcome"></div>
+
+  <div class="outcome-summary" id="outcome-summary"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="legend">
+    <span><i class="dot primary"></i> primary source (TSA / NIST direct)</span>
+    <span><i class="dot derived"></i> derived (third-party crosswalk, cited)</span>
+    <span><i class="dot author-mapped"></i> author-mapped — author's own domain mapping, verified 2026‑09‑16</span>
+  </div>
+
+  <footer>
+    <div>Sources: TSA Security Directive Pipeline‑2021‑02F · NIST SP 800‑82 Rev. 3 · NIST SP 800‑53 Rev. 5 · NIST CSF v2.0 / CPG–TSA crosswalk (regulations.gov docket TSA‑2022‑0001) · Open Security Architecture (CC BY‑SA 4.0) · IEC 62443‑3‑3 / 62443‑2‑3 (ID references only) · CIS Controls v8 (ID + paraphrase only, CC BY‑NC‑ND 4.0). Full citations in the project README.</div>
+    <div>Crosswalk dataset and docs © the authors, CC BY 4.0, except CIS Controls v8 and IEC 62443 cells, which follow their own source licenses.</div>
+    <div class="authors">Friday Ogochukwu Ikwuogu · ORCID 0009‑0009‑2222‑1318 · Independent Researcher, Odessa, Texas, USA — with David Mike‑Ewewie and Osorachukwu Maurice Ayozie, University of Texas Permian Basin</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var DATA = [
+{
+"tsa_outcome_id": "TSA-1",
+"tsa_outcome_name": "Network Segmentation",
+"tsa_outcome_summary": "Policies and controls so the OT system keeps operating safely if the IT system is compromised, and vice versa; documented IT/OT interdependencies and zone boundaries.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Network Architecture (network segmentation and boundary protection guidance, OT overlay of SC-7)",
+"description": "800-82 devotes a section to zone-based network architecture for ICS/OT and tailors SC-7-style boundary protection guidance for control-system networks.",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-1",
+"tsa_outcome_name": "Network Segmentation",
+"tsa_outcome_summary": "Policies and controls so the OT system keeps operating safely if the IT system is compromised, and vice versa; documented IT/OT interdependencies and zone boundaries.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "SC-7, SC-7(21), AC-4",
+"description": "Boundary Protection, Isolation of System Components, and Information Flow Enforcement — the controls TSA's own SD-2 Section A-F mapping cites for segmentation.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-1",
+"tsa_outcome_name": "Network Segmentation",
+"tsa_outcome_summary": "Policies and controls so the OT system keeps operating safely if the IT system is compromised, and vice versa; documented IT/OT interdependencies and zone boundaries.",
+"framework": "IEC 62443",
+"control_ids": "62443-3-3 SR 5.1, SR 5.2 (FR5 — Restricted Data Flow)",
+"description": "Zone-and-conduit network segmentation (SR 5.1, \"Network segmentation\") and zone boundary protection (SR 5.2, \"Zone boundary protection\") under the Restricted Data Flow foundational requirement. ID and function only — see IEC/ISA for full requirement text.",
+"source_type": "author-mapped",
+"source_citation": "[ID/title confirmed 2026-09-16 vs. TeepTrak IEC 62443-3-3 requirements guide; outcome-to-SR assignment remains the author's own judgment, pending check against a licensed copy] IEC 62443-3-3:2013 — ISA/IEC (paid standard, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-1",
+"tsa_outcome_name": "Network Segmentation",
+"tsa_outcome_summary": "Policies and controls so the OT system keeps operating safely if the IT system is compromised, and vice versa; documented IT/OT interdependencies and zone boundaries.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 12.2, 12.4, 13.4",
+"description": "Secure network architecture (12.2, \"Establish and Maintain a Secure Network Architecture\"), an up-to-date architecture diagram (12.4, \"Establish and Maintain Architecture Diagram(s)\"), and filtering traffic between network segments (13.4, \"Perform Traffic Filtering Between Network Segments\"). Paraphrased; see CIS for the safeguard text.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; outcome-to-safeguard assignment remains the author's own judgment] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only, no verbatim safeguard text"
+},
+{
+"tsa_outcome_id": "TSA-1",
+"tsa_outcome_name": "Network Segmentation",
+"tsa_outcome_summary": "Policies and controls so the OT system keeps operating safely if the IT system is compromised, and vice versa; documented IT/OT interdependencies and zone boundaries.",
+"framework": "NIST CSF 2.0",
+"control_ids": "PR.DS, PR.IR, PR.PS (CPG 2.F, 2.P)",
+"description": "Data Security, Technology Infrastructure Resilience, and Platform Security categories; CPG 2.F (limit OT exposure after an IT compromise) and 2.P (documented network topology).",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-2",
+"tsa_outcome_name": "Access Control",
+"tsa_outcome_summary": "Measures to identify, authenticate, and prevent unauthorized access to Critical Cyber Systems, local and remote, including multi-factor authentication.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Access Control (OT-tailored account management, remote access, least privilege)",
+"description": "800-82 tailors identity, authentication, and remote-access guidance to ICS/OT operating constraints (e.g., compensating controls where MFA isn't feasible on legacy devices).",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-2",
+"tsa_outcome_name": "Access Control",
+"tsa_outcome_summary": "Measures to identify, authenticate, and prevent unauthorized access to Critical Cyber Systems, local and remote, including multi-factor authentication.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-17, IA-2, IA-5, IA-8",
+"description": "Account Management through Remote Access, plus Identification & Authentication — TSA's own SD-2 Section A/B mapping.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-2",
+"tsa_outcome_name": "Access Control",
+"tsa_outcome_summary": "Measures to identify, authenticate, and prevent unauthorized access to Critical Cyber Systems, local and remote, including multi-factor authentication.",
+"framework": "IEC 62443",
+"control_ids": "62443-3-3 SR 1.1–SR 1.13 (FR1 — Identification & Authentication Control), SR 2.1 (FR2 — Use Control)",
+"description": "Identification/authentication of human (SR 1.1), software process/device (SR 1.2), and account/authenticator management (SR 1.3–1.13) users, and authorization enforcement once authenticated (SR 2.1). ID and function only.",
+"source_type": "author-mapped",
+"source_citation": "[ID/title confirmed 2026-09-16 vs. TeepTrak IEC 62443-3-3 requirements guide; outcome-to-SR assignment remains the author's own judgment, pending check against a licensed copy] IEC 62443-3-3:2013 — ISA/IEC (paid standard, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-2",
+"tsa_outcome_name": "Access Control",
+"tsa_outcome_summary": "Measures to identify, authenticate, and prevent unauthorized access to Critical Cyber Systems, local and remote, including multi-factor authentication.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 5.1–5.6 (Account Management), 6.3, 6.5 (Access Control Management, incl. MFA)",
+"description": "Inventory and management of accounts and administrative privileges (5.1–5.6), and requiring MFA for externally-exposed applications (6.3) and administrative access (6.5). Paraphrased.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; outcome-to-safeguard assignment remains the author's own judgment] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only"
+},
+{
+"tsa_outcome_id": "TSA-2",
+"tsa_outcome_name": "Access Control",
+"tsa_outcome_summary": "Measures to identify, authenticate, and prevent unauthorized access to Critical Cyber Systems, local and remote, including multi-factor authentication.",
+"framework": "NIST CSF 2.0",
+"control_ids": "PR.AA, GV.RR (CPG 2.A, 2.B, 2.C, 2.D, 2.E, 2.H)",
+"description": "Identity Management, Authentication & Access Control, and Roles/Responsibilities; CPGs covering default passwords, password strength, unique credentials, credential revocation, account separation, and phishing-resistant MFA.",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-3",
+"tsa_outcome_name": "Continuous Monitoring",
+"tsa_outcome_summary": "Policies and procedures to detect cybersecurity threats and correct anomalies affecting Critical Cyber Systems, including centralized, tamper-resistant logging.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Continuous Monitoring / Intrusion Detection (OT-tailored SI-4, AU family)",
+"description": "800-82 discusses ICS-appropriate intrusion detection and log-management approaches that avoid disrupting real-time OT operations.",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-3",
+"tsa_outcome_name": "Continuous Monitoring",
+"tsa_outcome_summary": "Policies and procedures to detect cybersecurity threats and correct anomalies affecting Critical Cyber Systems, including centralized, tamper-resistant logging.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "AU-2, AU-6, SI-2, SI-4",
+"description": "Event Logging, Audit Record Review, and System Monitoring — TSA's own SD-2 Section C/D mapping.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-3",
+"tsa_outcome_name": "Continuous Monitoring",
+"tsa_outcome_summary": "Policies and procedures to detect cybersecurity threats and correct anomalies affecting Critical Cyber Systems, including centralized, tamper-resistant logging.",
+"framework": "IEC 62443",
+"control_ids": "62443-3-3 SR 6.1, SR 6.2 (FR6 — Timely Response to Events)",
+"description": "Audit-log accessibility (SR 6.1, \"Audit log accessibility\") and continuous monitoring (SR 6.2, \"Continuous monitoring\") requirements under the Timely Response to Events foundational requirement. ID and function only.",
+"source_type": "author-mapped",
+"source_citation": "[ID/title confirmed 2026-09-16 vs. TeepTrak IEC 62443-3-3 requirements guide; outcome-to-SR assignment remains the author's own judgment, pending check against a licensed copy] IEC 62443-3-3:2013 — ISA/IEC (paid standard, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-3",
+"tsa_outcome_name": "Continuous Monitoring",
+"tsa_outcome_summary": "Policies and procedures to detect cybersecurity threats and correct anomalies affecting Critical Cyber Systems, including centralized, tamper-resistant logging.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 8.2, 8.5, 8.9 (Audit Log Management), 13.1, 13.2 (Network Monitoring & Defense)",
+"description": "Collecting (8.2) and detailed (8.5) audit logs, centralized (8.9); centralized security event alerting (13.1) and host-based intrusion detection (13.2). Paraphrased.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; outcome-to-safeguard assignment remains the author's own judgment] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only"
+},
+{
+"tsa_outcome_id": "TSA-3",
+"tsa_outcome_name": "Continuous Monitoring",
+"tsa_outcome_summary": "Policies and procedures to detect cybersecurity threats and correct anomalies affecting Critical Cyber Systems, including centralized, tamper-resistant logging.",
+"framework": "NIST CSF 2.0",
+"control_ids": "DE.CM, DE.AE (CPG 2.G, 2.T, 2.U, 3.A)",
+"description": "Continuous Monitoring and Anomalies & Events categories; CPGs covering failed-login detection, centralized log collection, tamper-resistant log storage, and threat/TTP detection.",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-4",
+"tsa_outcome_name": "Patch Management",
+"tsa_outcome_summary": "A risk-based strategy to apply timely security patches and updates to operating systems, applications, drivers, and firmware on Critical Cyber Systems.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Patch Management (risk-based patching under OT availability constraints)",
+"description": "800-82 addresses the specific difficulty of patching ICS/OT components without operational disruption and recommends a risk-based, tested patching process.",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-4",
+"tsa_outcome_name": "Patch Management",
+"tsa_outcome_summary": "A risk-based strategy to apply timely security patches and updates to operating systems, applications, drivers, and firmware on Critical Cyber Systems.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "SI-2, RA-5, CM-3, SA-22",
+"description": "Flaw Remediation, Vulnerability Monitoring & Scanning, Configuration Change Control, and Unsupported System Components — TSA's own SD-1/SD-2 Section D-G mapping.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-4",
+"tsa_outcome_name": "Patch Management",
+"tsa_outcome_summary": "A risk-based strategy to apply timely security patches and updates to operating systems, applications, drivers, and firmware on Critical Cyber Systems.",
+"framework": "IEC 62443",
+"control_ids": "IEC TR 62443-2-3 (Patch management in the IACS environment); 62443-3-3 SR 7.6 (FR7 — Resource Availability)",
+"description": "IEC TR 62443-2-3 is a dedicated Technical Report (informative, not a full normative standard) on the IACS patch-management process; SR 7.6 (\"Network and security configuration settings\") sits under Resource Availability. ID and scope only.",
+"source_type": "author-mapped",
+"source_citation": "[Title/scope confirmed 2026-09-16 via IEC/ISA/ANSI standards catalogs and TeepTrak; note corrected to \"TR\" (Technical Report) status; outcome-to-SR assignment remains the author's own judgment] IEC TR 62443-2-3:2015 and IEC 62443-3-3:2013 — ISA/IEC (paid standards, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-4",
+"tsa_outcome_name": "Patch Management",
+"tsa_outcome_summary": "A risk-based strategy to apply timely security patches and updates to operating systems, applications, drivers, and firmware on Critical Cyber Systems.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 7.1–7.7 (Continuous Vulnerability Management)",
+"description": "Establishing vulnerability-management (7.1) and remediation (7.2) processes, automated OS (7.3) and application (7.4) patching, automated internal (7.5) and external (7.6) vulnerability scanning, and remediating detected vulnerabilities (7.7). Paraphrased.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; outcome-to-safeguard assignment remains the author's own judgment] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only"
+},
+{
+"tsa_outcome_id": "TSA-4",
+"tsa_outcome_name": "Patch Management",
+"tsa_outcome_summary": "A risk-based strategy to apply timely security patches and updates to operating systems, applications, drivers, and firmware on Critical Cyber Systems.",
+"framework": "NIST CSF 2.0",
+"control_ids": "ID.AM, ID.RA (CPG 1.A, 1.E, 2.Q)",
+"description": "Asset Management and Risk Assessment categories; CPGs covering asset/vulnerability identification, mitigating known-exploited vulnerabilities, and a hardware/software approval process.",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-5",
+"tsa_outcome_name": "Governance & Risk Management",
+"tsa_outcome_summary": "Establish organizational cybersecurity leadership (an accountable executive and a primary/alternate Cybersecurity Coordinator), a documented risk management strategy, and vendor/supply-chain cybersecurity requirements.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Governance / Program Management (OT-tailored organizational roles and risk strategy)",
+"description": "800-82 discusses establishing OT-specific cybersecurity leadership and a risk management program appropriate to control-system operating constraints.",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-5",
+"tsa_outcome_name": "Governance & Risk Management",
+"tsa_outcome_summary": "Establish organizational cybersecurity leadership (an accountable executive and a primary/alternate Cybersecurity Coordinator), a documented risk management strategy, and vendor/supply-chain cybersecurity requirements.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "PM-01, PM-02, PM-09, PM-10, PM-13, PM-15, PL-01, PL-02, AT-01–AT-04",
+"description": "Information Security Program Plan/Leadership, Risk Management Strategy, Authorization Process, Security Workforce, Security Groups, Policy & System Security Plans, and Awareness & Training program — TSA's own SD-1/SD-2 Section 1-2, E, H mapping.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-5",
+"tsa_outcome_name": "Governance & Risk Management",
+"tsa_outcome_summary": "Establish organizational cybersecurity leadership (an accountable executive and a primary/alternate Cybersecurity Coordinator), a documented risk management strategy, and vendor/supply-chain cybersecurity requirements.",
+"framework": "IEC 62443",
+"control_ids": "IEC 62443-2-1:2024 (Security Program Requirements for IACS Asset Owners)",
+"description": "A dedicated document establishing an organization-wide Cyber Security Management System (CSMS) — governance, roles, risk assessment process, and supply-chain requirements for IACS asset owners. Whole-document fit; ID and scope only.",
+"source_type": "author-mapped",
+"source_citation": "[Title confirmed 2026-09-16 via IEC/ISA/BSI standards catalogs; outcome-to-document assignment is the author's own judgment] IEC 62443-2-1:2024 — ISA/IEC (paid standard, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-5",
+"tsa_outcome_name": "Governance & Risk Management",
+"tsa_outcome_summary": "Establish organizational cybersecurity leadership (an accountable executive and a primary/alternate Cybersecurity Coordinator), a documented risk management strategy, and vendor/supply-chain cybersecurity requirements.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 14.1, 14.9 (Security Awareness and Skills Training) — partial fit",
+"description": "Establishing a security awareness program (14.1) and role-specific training (14.9). CIS Controls v8 predates NIST CSF 2.0's dedicated Govern function and has no direct equivalent to \"accountable executive\" or risk-strategy requirements — this is the closest, but a weaker fit than the other three outcomes' CIS mappings. Paraphrased.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; fit itself is weak and flagged for author review, not just the ID] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only"
+},
+{
+"tsa_outcome_id": "TSA-5",
+"tsa_outcome_name": "Governance & Risk Management",
+"tsa_outcome_summary": "Establish organizational cybersecurity leadership (an accountable executive and a primary/alternate Cybersecurity Coordinator), a documented risk management strategy, and vendor/supply-chain cybersecurity requirements.",
+"framework": "NIST CSF 2.0",
+"control_ids": "GV.RM, GV.OC, GV.RR, GV.OV, GV.PO, GV.SC (CPG 1.B, 1.C, 1.G, 1.H, 1.I)",
+"description": "Risk Management Strategy, Organizational Context, Roles/Responsibilities, Oversight, Policy, and Cybersecurity Supply Chain Risk Management categories; CPGs covering accountable executive designation, OT-specific leadership, and supply-chain incident/vulnerability requirements.",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-6",
+"tsa_outcome_name": "Assessment & Incident Response",
+"tsa_outcome_summary": "Conduct annual cybersecurity evaluations and periodic (every-2-year) architecture assessments, and maintain a tested Cybersecurity Incident Response Plan with required CISA reporting timelines.",
+"framework": "NIST SP 800-82 Rev. 3",
+"control_ids": "§ Incident Response / Assessment (OT-tailored IR planning and periodic architecture review)",
+"description": "800-82 addresses ICS-appropriate incident response planning, exercises, and periodic security-architecture assessment without disrupting safety-critical operations.",
+"source_type": "primary",
+"source_citation": "NIST SP 800-82 Rev. 3, csrc.nist.gov/pubs/sp/800/82/r3/final"
+},
+{
+"tsa_outcome_id": "TSA-6",
+"tsa_outcome_name": "Assessment & Incident Response",
+"tsa_outcome_summary": "Conduct annual cybersecurity evaluations and periodic (every-2-year) architecture assessments, and maintain a tested Cybersecurity Incident Response Plan with required CISA reporting timelines.",
+"framework": "NIST SP 800-53 Rev. 5",
+"control_ids": "CA-02, CA-05, CA-07, CA-08, IR-01, IR-04, IR-06, PL-08",
+"description": "Control Assessments, POA&M, Continuous Monitoring, Penetration Testing, IR Policy/Handling/Reporting, and Security Architecture — TSA's own SD-1 Sec 2-4 / SD-2 Sec C-G mapping.",
+"source_type": "derived",
+"source_citation": "Open Security Architecture, \"TSA Pipeline SD — Control Mappings,\" opensecurityarchitecture.org (CC BY-SA 4.0), accessed 2026-09-14"
+},
+{
+"tsa_outcome_id": "TSA-6",
+"tsa_outcome_name": "Assessment & Incident Response",
+"tsa_outcome_summary": "Conduct annual cybersecurity evaluations and periodic (every-2-year) architecture assessments, and maintain a tested Cybersecurity Incident Response Plan with required CISA reporting timelines.",
+"framework": "IEC 62443",
+"control_ids": "IEC 62443-3-2:2020 (Security risk assessment for system design); IEC 62443-2-1:2024 (IR-related CSMS elements)",
+"description": "62443-3-2 is a dedicated document on periodic, zone-based security risk assessment for IACS; the CSMS in 62443-2-1 also specifies incident planning and response elements. ID and scope only.",
+"source_type": "author-mapped",
+"source_citation": "[Titles confirmed 2026-09-16 via IEC/ISA/ANSI standards catalogs; outcome-to-document assignment is the author's own judgment] IEC 62443-3-2:2020 and IEC 62443-2-1:2024 — ISA/IEC (paid standards, not reproduced here)"
+},
+{
+"tsa_outcome_id": "TSA-6",
+"tsa_outcome_name": "Assessment & Incident Response",
+"tsa_outcome_summary": "Conduct annual cybersecurity evaluations and periodic (every-2-year) architecture assessments, and maintain a tested Cybersecurity Incident Response Plan with required CISA reporting timelines.",
+"framework": "CIS Controls v8",
+"control_ids": "Safeguards 17.1–17.9 (Incident Response Management), 18.1–18.5 (Penetration Testing)",
+"description": "Designating IR personnel, an incident reporting/response process, communication mechanisms, routine exercises, and post-incident reviews (17.x); a penetration-testing program with periodic internal/external tests (18.x). Paraphrased.",
+"source_type": "author-mapped",
+"source_citation": "[IDs/titles confirmed 2026-09-16 direct from cisecurity.org/controls/cis-controls-navigator/v8; outcome-to-safeguard assignment remains the author's own judgment] CIS Controls v8, cisecurity.org (CC BY-NC-ND 4.0) — ID + original paraphrase only"
+},
+{
+"tsa_outcome_id": "TSA-6",
+"tsa_outcome_name": "Assessment & Incident Response",
+"tsa_outcome_summary": "Conduct annual cybersecurity evaluations and periodic (every-2-year) architecture assessments, and maintain a tested Cybersecurity Incident Response Plan with required CISA reporting timelines.",
+"framework": "NIST CSF 2.0",
+"control_ids": "ID.IM, RS.MA, RS.AN, RS.CO, RC.RP, RC.CO (CPG 2.S, 4.A, 4.B, 5.A)",
+"description": "Improvement, Incident Management, Analysis, Incident Response Communication, Incident Recovery, and Recovery Communication categories; CPGs covering IR plan maintenance/exercises, CISA incident/vulnerability reporting, and recovery planning.",
+"source_type": "primary",
+"source_citation": "NIST CSF v2.0 / CPG / TSA requirements crosswalk, docket TSA-2022-0001-0041 attachment_1.pdf, downloads.regulations.gov, accessed 2026-09-14"
+}
+];
+
+  var outcomes = [];
+  var byOutcome = {};
+  DATA.forEach(function(row){
+    if(!byOutcome[row.tsa_outcome_id]){
+      byOutcome[row.tsa_outcome_id] = { name: row.tsa_outcome_name, summary: row.tsa_outcome_summary, rows: [] };
+      outcomes.push(row.tsa_outcome_id);
+    }
+    byOutcome[row.tsa_outcome_id].rows.push(row);
+  });
+
+  var selector = document.getElementById('selector');
+  var summaryEl = document.getElementById('outcome-summary');
+  var gridEl = document.getElementById('grid');
+  var current = outcomes[0];
+
+  function render(){
+    selector.innerHTML = '';
+    outcomes.forEach(function(id){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role','tab');
+      b.setAttribute('aria-pressed', id === current ? 'true' : 'false');
+      b.innerHTML = '<span class="id">' + id + '</span>' + byOutcome[id].name;
+      b.addEventListener('click', function(){ current = id; render(); });
+      selector.appendChild(b);
+    });
+
+    var o = byOutcome[current];
+    summaryEl.innerHTML = '<strong>' + o.name + '.</strong> ' + o.summary;
+
+    gridEl.innerHTML = '';
+    o.rows.forEach(function(r){
+      var plate = document.createElement('div');
+      plate.className = 'plate';
+      var ids = r.control_ids.split(/,\s*/).map(function(x){ return '<code>' + x + '</code>'; }).join('');
+      var srcType = r.source_type;
+      plate.innerHTML =
+        '<div class="fw-name">' + r.framework + '</div>' +
+        '<div class="ids">' + ids + '</div>' +
+        '<p class="desc">' + r.description + '</p>' +
+        '<div class="src-line"><i class="dot ' + srcType + '"></i><span class="src-tag ' + srcType + '">' + srcType.replace('-', ' ') + '</span></div>';
+      gridEl.appendChild(plate);
+    });
+  }
+
+  render();
+  document.getElementById('rev-date').textContent = '2026‑09‑16';
+})();
+</script>
+</body>
+</html>

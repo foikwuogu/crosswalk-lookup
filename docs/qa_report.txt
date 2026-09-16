@@ -1,0 +1,54 @@
+QA report — Crosswalk Lookup v0.1
+Generated 2026-09-16 (expanded from 4 to 6 outcomes per author decision)
+
+Total rows: 30 (expected 6 outcomes x 5 frameworks = 30)
+Outcomes: ['TSA-1', 'TSA-2', 'TSA-3', 'TSA-4', 'TSA-5', 'TSA-6']
+Frameworks (5): ['CIS Controls v8', 'IEC 62443', 'NIST CSF 2.0', 'NIST SP 800-53 Rev. 5', 'NIST SP 800-82 Rev. 3']
+
+Completeness check (every outcome has all 5 frameworks):
+  TSA-1: 5/5 frameworks -- OK
+  TSA-2: 5/5 frameworks -- OK
+  TSA-3: 5/5 frameworks -- OK
+  TSA-4: 5/5 frameworks -- OK
+  TSA-5: 5/5 frameworks -- OK
+  TSA-6: 5/5 frameworks -- OK
+
+Empty-field check: none
+
+Rows by source_type:
+  author-mapped: 12
+  derived: 6
+  primary: 12
+
+2026-09-16 verification pass:
+  - All 12 author-mapped rows (IEC 62443 x6, CIS Controls v8 x6): every control/
+    document ID and exact title independently re-confirmed against a secondary
+    source (TeepTrak for IEC 62443-3-3; IEC/ISA/ANSI/BSI standards catalogs for
+    IEC 62443-2-1 and 62443-3-2; cisecurity.org Navigator v8 fetched directly for
+    CIS Controls v8). Zero ID/title mismatches found. IEC TR 62443-2-3 document
+    type corrected (was miscited as a full standard; it is a Technical Report).
+  - The outcome-to-control assignment for these 12 rows (no single published
+    TSA-to-IEC-62443 or TSA-to-CIS-Controls-v8 crosswalk exists) was the author's
+    own domain judgment. The Governance & Risk Management outcome's CIS Controls
+    v8 mapping remains flagged as a notably weaker fit than the other five
+    outcomes -- confirmed by the author as an accepted, documented limitation
+    rather than something to fix before release (see docs/LIMITATIONS.md item 1).
+  - Scope expanded from 4 to 6 outcomes (author decision, 2026-09-16), adding
+    Governance & Risk Management (TSA-5) and Assessment & Incident Response
+    (TSA-6), both anchored to the same regulations.gov CSF/CPG crosswalk used for
+    the original four.
+  - TSA SD Pipeline-2021-02F PDF: this session's fetch was blocked (403) twice
+    (2026-09-14, 2026-09-16). The author read it directly in their own browser
+    and confirmed the six outcome names/summaries match crosswalk.csv
+    (2026-09-16).
+  - Author independently ran `python3 code/02_build_site.py` locally (VS Code)
+    and reproduced this exact repository state: "Rebuilt site/index.html: 30
+    rows, 6 outcomes."
+
+Named spot checks: see docs/CODEBOOK.md -- all five confirmed by the author by
+hand, 2026-09-16.
+
+Overall: PASS (mechanical and content). All docs/VERIFY_CHECKLIST.md items are
+resolved and the corresponding author has signed off (2026-09-16). This project
+has left draft status. Remaining work is mechanical: push to GitHub and deposit
+to Zenodo once GITHUB_TOKEN / ZENODO_TOKEN are supplied.
