@@ -59,7 +59,7 @@ ASSUMPTIONS:
     confirmed by author
   - This is the public front-end for the same underlying dataset as the author's separate
     "TSA Pipeline Policy-to-Control Crosswalk" project — confirmed by author; built fresh
-    here since that project's files are not available in this session. Authorship: as of
+    here since that project's files are not available at build time. Authorship: as of
     2026-09-16, this project's AUTHORS.json matches that project's co-author list (David
     Mike-Ewewie, Osorachukwu Maurice Ayozie), at the author's explicit request for
     consistency — supersedes the 2026-09-14 version of this file, which used Abidemi

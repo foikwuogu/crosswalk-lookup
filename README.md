@@ -1,6 +1,6 @@
 # Crosswalk Lookup
 
-**Status: Verified — author sign-off complete 2026-09-16 (see `docs/VERIFY_CHECKLIST.md`). Awaiting GitHub + Zenodo publish.**
+**Status: Verified — author sign-off complete 2026-09-16 (see `docs/VERIFY_CHECKLIST.md`). Released on Zenodo: [10.5281/zenodo.22785152](https://doi.org/10.5281/zenodo.22785152).**
 **Version:** 0.1.0 (2026-09-16)
 **Category:** Software and interactive resources
 
@@ -25,9 +25,6 @@ compliance-prep use case wants maximal coverage and confidence, the research/pub
 case wants every judgment call disclosed rather than smoothed over. `docs/LIMITATIONS.md`
 and the `author-mapped` flags in `crosswalk.csv` exist to keep the third role's honesty from
 being sanded down by the first two.
-
-Live draft preview: `site/index.html` (also published as a Claude Artifact for
-interactive review — link shared separately with the author).
 
 ## What it covers
 
@@ -98,3 +95,7 @@ since both share the same underlying dataset.
 ## Maintainer
 
 Friday Ogochukwu Ikwuogu — fo.ikwuogu@gmail.com
+
+## AI assistance
+
+**AI assistance:** AI coding tools (Claude, Anthropic) were used for code scaffolding, test fixtures, and documentation drafting. The problem definition, methodology, classification rules, mappings, and analytic decisions are the author's own.
